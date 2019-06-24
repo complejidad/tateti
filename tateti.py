@@ -37,6 +37,39 @@ def elegirsimbolo():
 				b=True
 		reloj.tick(60)
 		pygame.display.flip()
+	pygame.quit()
+
+def volverajugar():
+	pygame.draw.rect(Screen,white,[(margen+largo) * 0 + margen, (margen+alto) * 0 + margen,330,alto])
+	pygame.draw.rect(Screen,white,[(margen+largo) * 1 + margen, (margen+alto) * 1 + margen,largo,alto])
+	pygame.draw.rect(Screen,white,[(margen+largo) * 1 + margen, (margen+alto) * 2 + margen,largo,alto])
+	mens="Deseas seguir jugando?"
+	mensaje=pygame.font.Font(None,40).render(mens, 1, black)
+	Screen.blit(mensaje,(20,50))
+	mens="SI"
+	mensaje=pygame.font.Font(None,85).render(mens, 1, black)
+	Screen.blit(mensaje,(150,155))
+	mens="NO"
+	mensaje=pygame.font.Font(None,80).render(mens, 1, black)
+	Screen.blit(mensaje,(140,270))
+	b=False
+	while b==False:
+		evento=pygame.event.wait()
+		if evento.type == pygame.QUIT:
+			b=True
+		elif evento.type == pygame.MOUSEBUTTONDOWN:
+			pos=pygame.mouse.get_pos()
+			columna = pos[0] // (largo + margen+margen/2)
+			fila = pos[1] // (alto + margen+margen/2)
+			if columna==1 and fila==1:
+				return (True)
+				b=True
+			elif columna==1 and fila==2:
+				return (False)
+				b=True
+		reloj.tick(60)
+		pygame.display.flip()
+	pygame.quit()
 
 def retricula():
 	pygame.draw.rect(Screen,white,[(margen+largo) * 0 + margen, (margen+alto) * 0 + margen,largo,alto])
@@ -78,7 +111,6 @@ def mostrarsimbolo(fila,columna,letra):
 	
 
 def mostrarmensaje (mens):
-	#mens='Juego Terminado!'
 	mensaje=pygame.font.Font(None,50).render(mens, 1, black)
 	Surface=pygame.Surface((330,100))
 	Surface.fill(white)
@@ -188,18 +220,18 @@ def obtenerjugadapc (m,lc,lh):
 	mostrarsimbolo(la[0],la[1],lc)
 	return(m)
 
-grid=[[0,0,0],[0,0,0],[0,0,0]]
 salir= False
-lh,lc=elegirsimbolo()
-Screen.fill(black)
-retricula()
-juegoencurso=True
 while not salir:
+	grid=[[0,0,0],[0,0,0],[0,0,0]]
+	lh,lc=elegirsimbolo()
+	Screen.fill(black)
+	retricula()
+	juegoencurso=True
 	c=0
-	while juegoencurso and not salir:
+	while juegoencurso:
 		evento=pygame.event.wait()
 		if evento.type == pygame.QUIT:
-			salir=True
+			pygame.quit()
 		elif evento.type == pygame.MOUSEBUTTONDOWN:
 			c=c+1
 			b=False
@@ -212,8 +244,10 @@ while not salir:
 				grid,b=obtenerjugada(grid,fila,columna,lh)
 				if b==False:
 					evento=pygame.event.wait()
-					while evento.type != pygame.MOUSEBUTTONDOWN:
+					while (evento.type != pygame.MOUSEBUTTONDOWN) or (evento.type != pygame.QUIT):
 						evento=pygame.event.wait()
+				if evento.type == pygame.QUIT:
+					pygame.quit()
 			if ((c>4) and (Gano(grid,lh)==True)):
 				mostrarmensaje('Gano humano')
 				juegoencurso=False
@@ -223,7 +257,7 @@ while not salir:
 			if juegoencurso==True and c<10:
 				grid=obtenerjugadapc(grid,lc,lh)
 				if ((c>4) and (Gano(grid,lc)==True)):
-					mostrarmensaje('Gano PC')
+					mostrarmensaje('   Gano PC')
 					juegoencurso=False
 				#Caso empate
 			if c>=9:
@@ -232,6 +266,15 @@ while not salir:
 		reloj.tick(60)
 		pygame.display.flip()
 	evento=pygame.event.wait()
-	if evento.type == pygame.MOUSEBUTTONDOWN:
+	if evento.type == pygame.QUIT:
 		salir=True
+	else:
+		while evento.type != pygame.MOUSEBUTTONDOWN:
+			evento=pygame.event.wait()
+			if evento.type== pygame.MOUSEBUTTONDOWN:
+				Screen.fill(black)
+				a=volverajugar()
+				if a==False:
+					salir=True
+				Screen.fill(black)
 pygame.quit()
